@@ -1,40 +1,111 @@
 <template>
   <Layout>
-    <!-- Learn how to use images here: https://gridsome.org/docs/images -->
-    <g-image alt="Example image" src="~/favicon.png" width="135" />
-
-    <h1>Hello, world!</h1>
-
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur
-      excepturi labore tempore expedita, et iste tenetur suscipit explicabo!
-      Dolores, aperiam non officia eos quod asperiores
-    </p>
-
-    <p class="home-links font-medium font-mono">
-      <a href="https://gridsome.org/docs/" target="_blank" rel="noopener"
-        >Gridsome Docs</a
+    <div class="wrapper flex">
+      <video class="video" autoplay muted loop>
+        <source :src="video" type="video/mp4" />
+      </video>
+      <div
+        class="chat flex flex-col px-3 py-2 bg-white bg-opacity-75 rounded-lg"
       >
-      <a
-        href="https://github.com/gridsome/gridsome"
-        target="_blank"
-        rel="noopener"
-        >GitHub</a
-      >
-    </p>
+        <Message
+          :key="message.uuid"
+          v-for="message in messages"
+          :message="message"
+          @choice="handleChoice"
+        />
+      </div>
+    </div>
   </Layout>
 </template>
 
 <script>
+import Message from '../components/Message';
+
 export default {
+  name: 'Home',
   metaInfo: {
     title: 'Hello, world!',
+  },
+  components: {
+    Message,
+  },
+  data() {
+    return {
+      video: null,
+      messages: [],
+      questions: null,
+    };
+  },
+  created() {
+    const globalNode = this.$page.allStoryblokEntry.edges.find(
+      (edge) => edge.node.name === 'global'
+    );
+
+    this.video = globalNode.node.content.background_video.filename;
+    this.questions = this.$page.allStoryblokEntry.edges
+      .filter((edge) =>
+        ['question', 'solution'].includes(edge.node.content.component)
+      )
+      .map((edge) => edge.node);
+
+    // Set the first question
+    const firstQuestion = this.$page.allStoryblokEntry.edges.find(
+      (edge) =>
+        edge.node.is_startpage === true &&
+        edge.node.content.component === 'question'
+    );
+    this.messages.push(firstQuestion.node);
+  },
+  methods: {
+    handleChoice(data) {
+      const { answer, link } = data;
+      const newQuestion = this.questions.find(
+        (question) => question.uuid === link
+      );
+      this.messages.push(answer);
+      setTimeout(() => {
+        this.messages.push(newQuestion);
+      }, 1000);
+    },
   },
 };
 </script>
 
-<style>
-.home-links a {
-  margin-right: 1rem;
+<page-query>
+query {
+  allStoryblokEntry {
+    edges {
+      node {
+        uuid
+        name
+        content
+        is_startpage
+      }
+    }
+  }
+}
+</page-query>
+
+<style lang="postcss" scoped>
+.wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  justify-content: center;
+  align-items: center;
+}
+.video {
+  position: absolute;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.chat {
+  width: 50%;
+  max-width: 768px;
+  height: 80%;
 }
 </style>

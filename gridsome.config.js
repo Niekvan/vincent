@@ -1,4 +1,5 @@
 const tailwind = require('tailwindcss');
+const postcssNested = require('postcss-nested');
 
 module.exports = {
   siteName: 'Gridsome',
@@ -20,7 +21,7 @@ module.exports = {
   css: {
     loaderOptions: {
       postcss: {
-        plugins: [tailwind],
+        plugins: [tailwind, postcssNested],
       },
     },
   },
