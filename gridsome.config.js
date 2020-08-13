@@ -2,7 +2,7 @@ const tailwind = require('tailwindcss');
 const postcssNested = require('postcss-nested');
 
 module.exports = {
-  siteName: 'Gridsome',
+  siteName: 'Geodesign',
   plugins: [
     {
       use: 'gridsome-source-storyblok',

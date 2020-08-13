@@ -2,8 +2,12 @@
   <transition name="fade" appear>
     <div :class="isAnswer ? 'self-end' : 'self-start'">
       <div
-        class="p-4 mb-2 bg-white text-gray-800 max-w-sm rounded-lg shadow"
-        :class="isAnswer ? 'rounded-tr-sm' : 'rounded-tl-sm'"
+        class="p-4 mb-2 max-w-sm rounded-lg shadow"
+        :class="
+          isAnswer
+            ? 'rounded-tr-sm bg-gray-700 text-white'
+            : 'rounded-tl-sm bg-white text-gray-800'
+        "
         v-html="content"
       />
       <template v-if="!isAnswer && message.content.options">
@@ -11,12 +15,15 @@
           <button
             :key="option._uid"
             v-for="option in message.content.options"
-            class="px-5 py-3 mr-2 mt-4 mb-4 bg-blue-500 text-gray-100 rounded-md outline-none"
-            :class="
+            class="px-5 py-3 mr-2 mt-4 mb-4 transition duration-150 rounded-md bg-blue-500 hover:bg-blue-600 text-white outline-none focus:outline-none"
+            :class="[
               chosen && chosen !== option._uid
-                ? 'cursor-not-allowed opacity-50'
-                : ''
-            "
+                ? 'cursor-not-allowed opacity-25 hover:blue-bg-500'
+                : '',
+              chosen && chosen === option._uid
+                ? 'bg-blue-600 cursor-default'
+                : '',
+            ]"
             @click="handleChoice(option)"
           >
             {{ option.option }}

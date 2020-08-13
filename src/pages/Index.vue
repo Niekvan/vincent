@@ -35,7 +35,7 @@ import Message from '../components/Message';
 export default {
   name: 'Home',
   metaInfo: {
-    title: 'Hello, world!',
+    title: 'Geodesign',
   },
   components: {
     Message,
