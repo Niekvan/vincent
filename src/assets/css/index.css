@@ -1,9 +1,13 @@
 @import './tailwind.css';
 
+:root {
+  --margin-top: 105px;
+}
+
 html {
   position: relative;
-  height: calc(100vh - 150px);
-  margin-top: 150px;
+  height: calc(100vh - var(--margin-top));
+  margin-top: var(--margin-top);
 }
 
 body {

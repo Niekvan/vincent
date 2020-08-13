@@ -1,16 +1,22 @@
 <template>
   <transition name="fade" appear>
-    <div
-      class="p-2 mb-2 bg-blue-400 text-gray-800 max-w-sm rounded-md"
-      :class="isAnswer ? 'self-end' : 'self-start'"
-    >
-      <div v-html="content" />
+    <div :class="isAnswer ? 'self-end' : 'self-start'">
+      <div
+        class="p-4 mb-2 bg-white text-gray-800 max-w-sm rounded-lg shadow"
+        :class="isAnswer ? 'rounded-tr-sm' : 'rounded-tl-sm'"
+        v-html="content"
+      />
       <template v-if="!isAnswer && message.content.options">
-        <div class="flex w-full justify-end">
+        <div class="flex w-full justify-start">
           <button
             :key="option._uid"
             v-for="option in message.content.options"
-            class="px-2 py-1 ml-2 text-sm bg-blue-900 text-gray-200 rounded-md"
+            class="px-5 py-3 mr-2 mt-4 mb-4 bg-blue-500 text-gray-100 rounded-md outline-none"
+            :class="
+              chosen && chosen !== option._uid
+                ? 'cursor-not-allowed opacity-50'
+                : ''
+            "
             @click="handleChoice(option)"
           >
             {{ option.option }}
@@ -35,6 +41,7 @@ export default {
   data() {
     return {
       isAnswer: typeof this.message === 'string',
+      chosen: null,
     };
   },
   computed: {
@@ -48,7 +55,10 @@ export default {
   },
   methods: {
     handleChoice(option) {
-      this.$emit('choice', { answer: option.answer, link: option.link.id });
+      if (this.chosen === null) {
+        this.chosen = option._uid;
+        this.$emit('choice', { answer: option.answer, link: option.link.id });
+      }
     },
   },
 };

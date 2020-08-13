@@ -20,7 +20,9 @@ module.exports = {
     },
   },
   theme: {
-    extend: {},
+    extend: {
+      stroke: (theme) => theme('colors'),
+    },
   },
   variants: {},
   plugins: [],
