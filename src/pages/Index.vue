@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { json } from 'd3-fetch';
+import axios from 'axios';
 
 import Globe from '../components/Globe';
 import Message from '../components/Message';
@@ -51,9 +51,10 @@ export default {
     };
   },
   async created() {
-    this.world = await json(
+    const { data: world } = await axios.get(
       'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
     );
+    this.world = world;
     const globalNode = this.$page.allStoryblokEntry.edges.find(
       (edge) => edge.node.name === 'global'
     );
