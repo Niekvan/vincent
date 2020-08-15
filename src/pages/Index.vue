@@ -13,12 +13,17 @@
       <div
         class="shadow-container relative ml-40 w-1/2 max-w-lg h-full overflow-hidden bg-transparent rounded-lg"
       >
-        <div ref="messageBox" class="list flex flex-col items-end pt-20 pb-20">
-          <Message
+        <div ref="messageBox" class="list pt-20 pb-20">
+          <component
             :key="`${message.uuid}-${index}`"
             v-for="(message, index) in messages"
             :message="message"
+            :is-answer="typeof message === 'string'"
+            :is="getComponent(message)"
+            class="flex flex-col items-end"
             @choice="handleChoice"
+            @updateScroll="scrollToBottom"
+            @observe="observeElement"
           />
         </div>
       </div>
@@ -31,6 +36,8 @@ import axios from 'axios';
 
 import Globe from '../components/Globe';
 import Message from '../components/Message';
+import Question from '../components/Question';
+import Solution from '../components/Solution';
 
 export default {
   name: 'Home',
@@ -38,8 +45,10 @@ export default {
     title: 'Geodesign',
   },
   components: {
-    Message,
     Globe,
+    Message,
+    Question,
+    Solution,
   },
   data() {
     return {
@@ -48,6 +57,7 @@ export default {
       questions: null,
       deployments: null,
       world: null,
+      observer: null,
     };
   },
   async created() {
@@ -81,22 +91,43 @@ export default {
       .filter((edge) => edge.node.content.component === 'deployment')
       .map((edge) => edge.node);
   },
+  mounted() {
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          if (window.lazySizes) {
+            console.log(entry.target);
+            window.lazySizes.autoSizer.updateElem(entry.target);
+          }
+          this.observer.unobserve(entry.target);
+        }
+      });
+    });
+  },
   methods: {
-    handleChoice(data) {
+    async handleChoice(data) {
       const { answer, link } = data;
       const newQuestion = this.questions.find(
         (question) => question.uuid === link
       );
       this.messages.push(answer);
-      this.$nextTick(() => {
-        this.$refs.messageBox.scrollTop = this.$refs.messageBox.scrollHeight;
-      });
+      this.scrollToBottom();
+
       setTimeout(() => {
         this.messages.push(newQuestion);
-        this.$nextTick(() => {
-          this.$refs.messageBox.scrollTop = this.$refs.messageBox.scrollHeight;
-        });
+        this.scrollToBottom();
       }, 1000);
+    },
+    async scrollToBottom() {
+      await this.$nextTick();
+      this.$refs.messageBox.scrollTop = this.$refs.messageBox.scrollHeight;
+    },
+    getComponent(item) {
+      if (typeof item === 'string') return 'message';
+      return item.content.component;
+    },
+    observeElement(element) {
+      this.observer.observe(element);
     },
   },
 };
