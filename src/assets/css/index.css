@@ -6,6 +6,8 @@
 
 html {
   position: relative;
+  height: calc(100vh - 105px);
+  margin-top: 105px;
   height: calc(100vh - var(--margin-top));
   margin-top: var(--margin-top);
 }

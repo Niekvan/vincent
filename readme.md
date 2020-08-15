@@ -1,12 +1,12 @@
 # todo
 
-- [ ] Handle deployment emit
-- [ ] Reset chat state
-- [ ] Toggle globe and video
-- [ ] New video each question
+- [x] Handle deployment emit
+- [x] Reset chat state
+- [x] Toggle globe and video
+- [x] New video each question
 - [ ] Color palette
-- [ ] Fade shadow top/bottom message box
+- [x] Fade shadow top/bottom message box
 - [ ] Chatbot image
-- [ ] Shadows messages/buttons
-- [ ] Animate first message
-- [ ] Animate chatbot start
+- [x] Shadows messages/buttons
+- [x] Animate first message
+- [x] Animate chatbot start
