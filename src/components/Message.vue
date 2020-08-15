@@ -9,8 +9,11 @@
             : 'rounded-tl-sm bg-white text-gray-800',
           isSolution ? 'max-w-full' : 'max-w-sm',
         ]"
-        v-html="message"
-      />
+      >
+        <slot>
+          <div v-html="message" />
+        </slot>
+      </div>
     </div>
   </transition>
 </template>
@@ -26,7 +29,6 @@ export default {
   props: {
     message: {
       type: String,
-      required: true,
     },
     isAnswer: {
       type: Boolean,
@@ -38,11 +40,3 @@ export default {
   },
 };
 </script>
-
-<style lang="postcss" scoped>
-::v-deep {
-  h1 {
-    font-size: 2em;
-  }
-}
-</style>

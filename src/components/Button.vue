@@ -1,6 +1,5 @@
 <template>
   <button
-    :key="option._uid"
     class="px-5 py-3 mr-2 mt-4 mb-4 transition duration-150 rounded-md bg-blue-500 hover:bg-blue-600 text-white outline-none focus:outline-none"
     :class="[
       hasChosen && !active
@@ -9,7 +8,7 @@
       hasChosen && active ? 'bg-blue-600 cursor-default' : '',
     ]"
   >
-    {{ option.option }}
+    {{ option }}
   </button>
 </template>
 
@@ -18,7 +17,7 @@ export default {
   name: 'Button',
   props: {
     option: {
-      type: Object,
+      type: String,
       required: true,
     },
     active: {

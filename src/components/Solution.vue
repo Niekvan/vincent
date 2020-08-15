@@ -5,9 +5,23 @@
       v-for="bubble in bubbles"
       :message="bubble.message"
       :is-answer="false"
-      :is-solution="true"
-      :class="bubble.class ? 'w-full' : ''"
     />
+    <message
+      v-show="showSolution"
+      :is-answer="false"
+      :is-solution="true"
+      class="w-full"
+    >
+      <c-image ref="image" :url="message.content.image.filename" />
+      <div v-html="content" />
+    </message>
+    <transition name="fade">
+      <c-button
+        v-show="showButton"
+        :option="answer"
+        @click.native="handleChoice(message.content.link)"
+      />
+    </transition>
   </div>
 </template>
 
@@ -17,12 +31,14 @@ import marked from 'marked';
 import { delay, createResponsiveImage } from '@/helpers';
 
 import CButton from './Button';
+import CImage from './ResizedImage';
 import Message from './Message';
 
 export default {
   name: 'Solution',
   components: {
     CButton,
+    CImage,
     Message,
   },
   props: {
@@ -34,6 +50,10 @@ export default {
   data() {
     return {
       bubbles: [],
+      answer: 'View depoyment solution',
+      content: null,
+      showSolution: false,
+      showButton: false,
     };
   },
   async mounted() {
@@ -43,25 +63,17 @@ export default {
       await delay(1000);
     }
 
-    const message = this.createHTML();
-    this.bubbles.push({ message, class: true });
-
+    this.content = marked(this.message.content.content);
     await this.$nextTick();
-    const img = document.getElementById(this.message.content.image.id);
-    this.$emit('observe', img);
+    this.showSolution = true;
+    this.$emit('observe', this.$refs.image.$el);
 
-    this.showOptions = true;
+    this.showButton = true;
     this.$emit('updateScroll');
   },
   methods: {
-    createHTML() {
-      const image = createResponsiveImage(
-        this.message.content.image.filename,
-        this.message.content.image.id
-      );
-      return `<h1>${this.message.content.title}</h1>\n${image}\n${marked(
-        this.message.content.content
-      )}`;
+    handleChoice(option) {
+      this.$emit('choice', { answer: this.answer, link: option.id });
     },
   },
 };

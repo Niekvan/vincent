@@ -5,7 +5,7 @@ export const delay = (time) =>
     }, time);
   });
 
-const createResizedUrl = (url, size, webp = false) => {
+export const createResizedUrl = (url, size, webp = false) => {
   if (webp) {
     return `https://img2.storyblok.com/${size}x0/filters:format(webp)${url.replace(
       'https://a.storyblok.com',
@@ -19,7 +19,7 @@ const createResizedUrl = (url, size, webp = false) => {
   )}`;
 };
 
-const calculateRatio = (url) => {
+export const calculateRatio = (url) => {
   const reg = /(?:^https:\/\/a\.storyblok\.com\/f\/[0-9]+\/)(?<width>[0-9]+)x(?<height>[0-9]+)/g;
   const match = reg.exec(url);
   if (match) {
@@ -29,19 +29,19 @@ const calculateRatio = (url) => {
   return 0;
 };
 
-export const createResponsiveImage = (url, id) => {
-  const sizes = [
-    '300',
-    '500',
-    '600',
-    '700',
-    '1000',
-    '1200',
-    '1500',
-    '1700',
-    '2000',
-  ];
+export const sizes = [
+  '300',
+  '500',
+  '600',
+  '700',
+  '1000',
+  '1200',
+  '1500',
+  '1700',
+  '2000',
+];
 
+export const createResponsiveImage = (url, id) => {
   const src = url.replace(
     'https://a.storyblok.com',
     'https://img2.storyblok.com/250x0'

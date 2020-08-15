@@ -11,7 +11,7 @@
         <c-button
           :key="option._uid"
           v-for="option in message.content.options"
-          :option="option"
+          :option="option.option"
           @click.native="handleChoice(option)"
         />
       </div>
@@ -47,7 +47,7 @@ export default {
     for await (const message of this.message.content.question) {
       this.bubbles.push(message);
       this.$emit('updateScroll');
-      await delay(1000);
+      await delay(500);
     }
 
     this.showOptions = true;

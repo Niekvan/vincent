@@ -1,15 +1,17 @@
 <template>
   <Layout>
     <div class="wrapper flex flex-col">
-      <!-- <video class="video" autoplay muted loop>
-        <source :src="video" type="video/mp4" />
-      </video> -->
-      <globe
-        class="absolute"
-        v-if="world"
-        :world="world"
-        :deployments="deployments"
-      />
+      <transition name="fade" mode="out-in">
+        <globe
+          class="absolute"
+          v-if="world && showWorld"
+          :world="world"
+          :deployments="deployments"
+        />
+        <video v-else ref="video" class="video" autoplay muted loop>
+          <source :src="video" type="video/mp4" />
+        </video>
+      </transition>
       <div
         class="shadow-container relative ml-40 w-1/2 max-w-lg h-full overflow-hidden bg-transparent rounded-lg"
       >
@@ -24,6 +26,8 @@
             @choice="handleChoice"
             @updateScroll="scrollToBottom"
             @observe="observeElement"
+            @globe="handleGlobe"
+            @reset="handleReset"
           />
         </div>
       </div>
@@ -35,7 +39,10 @@
 import axios from 'axios';
 
 import Globe from '../components/Globe';
+
 import Message from '../components/Message';
+
+import Deployment from '../components/Deployment';
 import Question from '../components/Question';
 import Solution from '../components/Solution';
 
@@ -46,30 +53,44 @@ export default {
   },
   components: {
     Globe,
+    Deployment,
     Message,
     Question,
     Solution,
   },
   data() {
     return {
-      video: null,
       messages: [],
       questions: null,
       deployments: null,
       world: null,
       observer: null,
+      showWorld: false,
+      video: null,
+      videoIndex: 0,
+      videos: null,
+    };
+  },
+  metaInfo() {
+    const edge = this.$page.allStoryblokEntry.edges.find(
+      (edge) => edge.node.name === 'global'
+    );
+    return {
+      link: edge.node.content.videos.map((item) => ({
+        rel: 'preload',
+        href: item.video.filename,
+        as: 'video',
+        type: 'video/mp4',
+      })),
     };
   },
   async created() {
-    const { data: world } = await axios.get(
-      'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
-    );
-    this.world = world;
     const globalNode = this.$page.allStoryblokEntry.edges.find(
       (edge) => edge.node.name === 'global'
     );
 
-    this.video = globalNode.node.content.background_video.filename;
+    this.videos = globalNode.node.content.videos;
+    this.video = this.videos[0].video.filename;
 
     this.questions = this.$page.allStoryblokEntry.edges
       .filter((edge) =>
@@ -90,13 +111,17 @@ export default {
     this.deployments = this.$page.allStoryblokEntry.edges
       .filter((edge) => edge.node.content.component === 'deployment')
       .map((edge) => edge.node);
+
+    const { data: world } = await axios.get(
+      'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
+    );
+    this.world = world;
   },
   mounted() {
     this.observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           if (window.lazySizes) {
-            console.log(entry.target);
             window.lazySizes.autoSizer.updateElem(entry.target);
           }
           this.observer.unobserve(entry.target);
@@ -110,6 +135,11 @@ export default {
       const newQuestion = this.questions.find(
         (question) => question.uuid === link
       );
+      if (this.videoIndex < this.videos.length - 1) {
+        this.videoIndex++;
+        this.video = this.videos[this.videoIndex].video.filename;
+        this.$refs.video.load();
+      }
       this.messages.push(answer);
       this.scrollToBottom();
 
@@ -117,6 +147,16 @@ export default {
         this.messages.push(newQuestion);
         this.scrollToBottom();
       }, 1000);
+    },
+    handleReset() {
+      this.videoIndex = 0;
+      this.video = this.videos[this.videoIndex].video.filename;
+      this.$refs.video.load();
+      this.showWorld = false;
+      this.messages.splice(1);
+    },
+    handleGlobe(show) {
+      this.showWorld = show;
     },
     async scrollToBottom() {
       await this.$nextTick();

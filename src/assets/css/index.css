@@ -24,7 +24,12 @@ body {
   opacity: 0;
 }
 
-.image {
+.image.lazyload,
+.image.lazyloaded {
   position: absolute;
   width: 100%;
+}
+
+img.lazyload:not([src]) {
+  visibility: hidden;
 }
