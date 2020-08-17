@@ -1,23 +1,34 @@
 <template>
-  <svg ref="svg" class="w-full h-full text-gray-300">
-    <path class="fill-current stroke-gray-500" :d="path" />
-    <path
-      class="fill-current text-transparent stroke-gray-500"
-      :d="graticulePath"
-    />
-    <circle
-      :key="deployment.content._uid"
-      v-for="deployment in deployments"
-      :cx="coordinateToProjection(deployment, 0)"
-      :cy="coordinateToProjection(deployment, 1)"
-      :class="calculateFill(deployment)"
-      class="fill-current cursor-pointer"
-      r="7"
-      @mouseenter="cancelRotation"
-      @mouseleave="continueRotation"
-      @click="showDeployment(deployment)"
-    />
-  </svg>
+  <div ref="container" class="relative w-full h-full">
+    <svg ref="svg" class="w-full h-full text-gray-300">
+      <path class="fill-current stroke-gray-500" :d="path" />
+      <path
+        class="fill-current text-transparent stroke-gray-500"
+        :d="graticulePath"
+      />
+      <circle
+        :key="solution.content._uid"
+        v-for="solution in solutions"
+        :cx="coordinateToProjection(solution, 0)"
+        :cy="coordinateToProjection(solution, 1)"
+        :class="calculateFill(solution)"
+        class="fill-current cursor-pointer"
+        r="7"
+        @mouseenter="cancelRotation($event, solution)"
+        @mouseleave="continueRotation"
+        @click="showSolution(solution)"
+      />
+    </svg>
+    <transition name="fade">
+      <div
+        v-show="showTooltip"
+        class="tooltip absolute p-2 bg-white shadow rounded"
+        :style="tooltipPosition"
+      >
+        {{ tooltipText }}
+      </div>
+    </transition>
+  </div>
 </template>
 
 <script>
@@ -30,7 +41,7 @@ let geoJson;
 export default {
   name: 'Globe',
   props: {
-    deployments: {
+    solutions: {
       type: Array,
       required: true,
     },
@@ -43,10 +54,13 @@ export default {
     return {
       path: '',
       graticulePath: '',
-      rotation: [0, -30, 0],
+      rotation: [0, -25, 0],
       projection: null,
       center: null,
       animationId: null,
+      showTooltip: false,
+      tooltipPosition: null,
+      tooltipText: null,
     };
   },
   created() {
@@ -67,19 +81,19 @@ export default {
     });
   },
   methods: {
-    coordinateToProjection(deployment, index) {
+    coordinateToProjection(solution, index) {
       return this.projection([
-        Number(deployment.content.long),
-        Number(deployment.content.lat),
+        Number(solution.content.long),
+        Number(solution.content.lat),
       ])[index];
     },
-    calculateFill(deployment) {
+    calculateFill(solution) {
       if (this.projection === null || this.center === null)
         return 'text-transparent';
 
       const coordinate = [
-        Number(deployment.content.long),
-        Number(deployment.content.lat),
+        Number(solution.content.long),
+        Number(solution.content.lat),
       ];
       const distance = geoDistance(
         coordinate,
@@ -102,17 +116,33 @@ export default {
         this.animationId = window.requestAnimationFrame(this.rotate);
       }
     },
-    cancelRotation() {
+    async cancelRotation(e, solution) {
       window.cancelAnimationFrame(this.animationId);
+      const bodyRect = this.$refs.container.getBoundingClientRect();
+      const box = e.target.getBoundingClientRect();
+      console.log(e, box);
+
+      this.tooltipPosition = {
+        left: `${box.left - bodyRect.left + (box.right - box.left) / 2}px`,
+        top: `${box.top - bodyRect.top}px`,
+      };
+      this.tooltipText = solution.content.title;
+      await this.$nextTick();
+      this.showTooltip = true;
     },
     continueRotation() {
+      this.showTooltip = false;
       this.animationId = window.requestAnimationFrame(this.rotate);
     },
-    showDeployment(deployment) {
-      this.$emit('deployment', deployment);
+    showSolution(solution) {
+      this.$emit('solution', solution);
     },
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.tooltip {
+  transform: translateX(-50%) translateY(calc(-100% - 0.5rem));
+}
+</style>

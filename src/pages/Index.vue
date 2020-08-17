@@ -1,28 +1,34 @@
 <template>
   <Layout>
-    <div class="wrapper flex flex-col">
+    <div class="wrapper flex flex-col justify-center">
       <transition name="fade" mode="out-in">
-        <globe
-          class="absolute"
+        <div
           v-if="world && showWorld"
-          :world="world"
-          :deployments="deployments"
-        />
-        <video v-else ref="video" class="video" autoplay muted loop>
+          class="absolute w-full h-full flex items-center justify-center"
+        >
+          <globe
+            class="max-w-screen-md"
+            :world="world"
+            :solutions="solutions"
+            @solution="handleGlobeSolution"
+          />
+        </div>
+        <video v-else ref="video" class="video" autoplay muted>
           <source :src="video" type="video/mp4" />
         </video>
       </transition>
       <div
-        class="shadow-container relative ml-40 w-1/2 max-w-lg h-full overflow-hidden bg-transparent rounded-lg"
+        class="shadow-container relative ml-40 w-1/2 max-w-xl h-64 overflow-hidden bg-transparent rounded-lg"
       >
-        <div ref="messageBox" class="list pt-20 pb-20">
+        <div ref="messageBox" class="list h-full pt-20 pb-20 overflow-y-scroll">
           <component
             :key="`${message.uuid}-${index}`"
             v-for="(message, index) in messages"
             :message="message"
+            :avatar="avatar"
             :is-answer="typeof message === 'string'"
             :is="getComponent(message)"
-            class="flex flex-col items-end"
+            class="relative flex flex-col items-end pl-16 pr-5"
             @choice="handleChoice"
             @updateScroll="scrollToBottom"
             @observe="observeElement"
@@ -61,7 +67,10 @@ export default {
   data() {
     return {
       messages: [],
+      globalSettings: null,
+      avatar: null,
       questions: null,
+      solutions: null,
       deployments: null,
       world: null,
       observer: null,
@@ -89,6 +98,12 @@ export default {
       (edge) => edge.node.name === 'global'
     );
 
+    this.globalSettings = {
+      ...globalNode?.node,
+    };
+
+    this.avatar = globalNode.node.content.chat_bot;
+
     this.videos = globalNode.node.content.videos;
     this.video = this.videos[0].video.filename;
 
@@ -107,6 +122,11 @@ export default {
         edge.node.content.component === 'question'
     );
     this.messages.push(firstQuestion.node);
+
+    // Set data for the globe
+    this.solutions = this.$page.allStoryblokEntry.edges
+      .filter((edge) => edge.node.content.component === 'solution')
+      .map((edge) => edge.node);
 
     this.deployments = this.$page.allStoryblokEntry.edges
       .filter((edge) => edge.node.content.component === 'deployment')
@@ -131,17 +151,18 @@ export default {
   },
   methods: {
     async handleChoice(data) {
-      const { answer, link } = data;
+      const { link } = data;
       const newQuestion = this.questions.find(
         (question) => question.uuid === link
       );
-      if (this.videoIndex < this.videos.length - 1) {
+      if (
+        this.videoIndex < this.videos.length - 1 &&
+        !newQuestion.is_startpage
+      ) {
         this.videoIndex++;
         this.video = this.videos[this.videoIndex].video.filename;
         this.$refs.video.load();
       }
-      this.messages.push(answer);
-      this.scrollToBottom();
 
       setTimeout(() => {
         this.messages.push(newQuestion);
@@ -157,6 +178,18 @@ export default {
     },
     handleGlobe(show) {
       this.showWorld = show;
+    },
+    handleGlobeSolution(solution) {
+      const deployment = this.deployments.find(
+        (deployment) => (deployment.uuid = solution.content.link.id)
+      );
+      this.messages.push(solution);
+      this.scrollToBottom();
+
+      setTimeout(() => {
+        this.messages.push(deployment);
+        this.scrollToBottom();
+      }, 500);
     },
     async scrollToBottom() {
       await this.$nextTick();
@@ -204,11 +237,12 @@ query {
 
 .list {
   width: calc(100% + 17px);
-  height: 100%;
-  overflow-y: scroll;
   scroll-behavior: smooth;
 }
+
 .shadow-container {
+  height: 50%;
+
   &::before,
   &::after {
     content: '';
@@ -222,6 +256,7 @@ query {
   &::before {
     top: 0;
     background: linear-gradient(to top, hsla(0, 0%, 100%, 0) 25%, #ffffff 100%);
+    z-index: 1;
   }
 
   &::after {

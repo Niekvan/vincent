@@ -1,12 +1,13 @@
 <template>
   <div>
+    <avatar :url="avatar.filename" />
     <message :is-answer="false" :is-solution="true" class="w-full">
       <h1>Deployment: {{ message.content.title }}</h1>
       <c-image ref="image" :url="message.content.image.filename" />
       <div v-html="content" />
     </message>
     <transition name="fade">
-      <div class="flex w-full justify-start">
+      <div class="flex w-full justify-end">
         <c-button :option="globalSolutions" @click.native="switchToGlobe" />
         <c-button :option="startOver" @click.native="reset" />
       </div>
@@ -17,6 +18,7 @@
 <script>
 import marked from 'marked';
 
+import Avatar from './Avatar';
 import CButton from './Button';
 import CImage from './ResizedImage';
 import Message from './Message';
@@ -24,12 +26,17 @@ import Message from './Message';
 export default {
   name: 'Deployment',
   components: {
+    Avatar,
     CButton,
     CImage,
     Message,
   },
   props: {
     message: {
+      type: Object,
+      required: true,
+    },
+    avatar: {
       type: Object,
       required: true,
     },
