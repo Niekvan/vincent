@@ -120,7 +120,6 @@ export default {
       window.cancelAnimationFrame(this.animationId);
       const bodyRect = this.$refs.container.getBoundingClientRect();
       const box = e.target.getBoundingClientRect();
-      console.log(e, box);
 
       this.tooltipPosition = {
         left: `${box.left - bodyRect.left + (box.right - box.left) / 2}px`,

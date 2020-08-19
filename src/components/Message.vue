@@ -5,7 +5,7 @@
         class="p-4 mb-2 rounded-lg shadow"
         :class="[
           isAnswer
-            ? 'rounded-tr-sm bg-gray-700 text-white'
+            ? 'mt-4 mb-4 rounded-tr-sm bg-gray-700 text-white'
             : 'rounded-tl-sm bg-white text-gray-800',
           isSolution ? 'max-w-full' : 'max-w-sm',
         ]"

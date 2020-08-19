@@ -1,22 +1,31 @@
 <template>
   <Layout>
     <div class="wrapper flex flex-col justify-center">
-      <transition name="fade" mode="out-in">
-        <div
+      <transition-group
+        name="fade"
+        mode="out-in"
+        tag="div"
+        class="absolute w-full h-full flex items-center justify-center"
+      >
+        <globe
+          key="globe"
           v-if="world && showWorld"
-          class="absolute w-full h-full flex items-center justify-center"
+          class="max-w-screen-md"
+          :world="world"
+          :solutions="solutions"
+          @solution="handleGlobeSolution"
+        />
+        <video
+          key="video"
+          v-show="!showWorld"
+          ref="video"
+          class="video"
+          autoplay
+          muted
         >
-          <globe
-            class="max-w-screen-md"
-            :world="world"
-            :solutions="solutions"
-            @solution="handleGlobeSolution"
-          />
-        </div>
-        <video v-else ref="video" class="video" autoplay muted>
           <source :src="video" type="video/mp4" />
         </video>
-      </transition>
+      </transition-group>
       <div
         class="shadow-container relative ml-40 w-1/2 max-w-xl h-64 overflow-hidden bg-transparent rounded-lg"
       >
@@ -28,6 +37,7 @@
             :avatar="avatar"
             :is-answer="typeof message === 'string'"
             :is="getComponent(message)"
+            :show-buttons="!showWorld"
             class="relative flex flex-col items-end pl-16 pr-5"
             @choice="handleChoice"
             @updateScroll="scrollToBottom"
@@ -43,6 +53,8 @@
 
 <script>
 import axios from 'axios';
+
+import { delay } from '@/helpers';
 
 import Globe from '../components/Globe';
 
@@ -66,8 +78,8 @@ export default {
   },
   data() {
     return {
+      firstMessage: null,
       messages: [],
-      globalSettings: null,
       avatar: null,
       questions: null,
       solutions: null,
@@ -94,17 +106,8 @@ export default {
     };
   },
   async created() {
-    const globalNode = this.$page.allStoryblokEntry.edges.find(
-      (edge) => edge.node.name === 'global'
-    );
-
-    this.globalSettings = {
-      ...globalNode?.node,
-    };
-
-    this.avatar = globalNode.node.content.chat_bot;
-
-    this.videos = globalNode.node.content.videos;
+    this.avatar = this.$page.global.content.chat_bot;
+    this.videos = this.$page.global.content.videos;
     this.video = this.videos[0].video.filename;
 
     this.questions = this.$page.allStoryblokEntry.edges
@@ -121,6 +124,7 @@ export default {
         edge.node.is_startpage === true &&
         edge.node.content.component === 'question'
     );
+    this.firstMessage = firstQuestion.node;
     this.messages.push(firstQuestion.node);
 
     // Set data for the globe
@@ -152,6 +156,12 @@ export default {
   methods: {
     async handleChoice(data) {
       const { link } = data;
+
+      if (this.showWorld && link === this.firstMessage.uuid) {
+        await this.handleReset();
+        return;
+      }
+
       const newQuestion = this.questions.find(
         (question) => question.uuid === link
       );
@@ -169,27 +179,29 @@ export default {
         this.scrollToBottom();
       }, 1000);
     },
-    handleReset() {
+    async handleReset() {
+      this.showWorld = false;
       this.videoIndex = 0;
       this.video = this.videos[this.videoIndex].video.filename;
+      await this.$nextTick();
       this.$refs.video.load();
-      this.showWorld = false;
-      this.messages.splice(1);
+      this.messages.splice(0);
+      this.messages.push(this.firstMessage);
     },
     handleGlobe(show) {
+      this.messages.splice(0);
+      this.messages.push(this.$page.globeMessage);
       this.showWorld = show;
     },
-    handleGlobeSolution(solution) {
+    async handleGlobeSolution(solution) {
       const deployment = this.deployments.find(
         (deployment) => (deployment.uuid = solution.content.link.id)
       );
       this.messages.push(solution);
       this.scrollToBottom();
-
-      setTimeout(() => {
-        this.messages.push(deployment);
-        this.scrollToBottom();
-      }, 500);
+      await delay(1000 * (solution.content.bubbles.length + 1));
+      this.messages.push(deployment);
+      this.scrollToBottom();
     },
     async scrollToBottom() {
       await this.$nextTick();
@@ -218,6 +230,17 @@ query {
       }
     }
   }
+  global: storyblokEntry(id: "story-17760467-default") {
+    content
+    id
+    uuid
+  }
+  
+  globeMessage: storyblokEntry(id: "story-18324548-default") {
+    content
+    id
+    uuid
+  }
 }
 </page-query>
 
@@ -241,7 +264,7 @@ query {
 }
 
 .shadow-container {
-  height: 50%;
+  height: 75%;
 
   &::before,
   &::after {

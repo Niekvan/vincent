@@ -16,16 +16,23 @@
       <c-image ref="image" :url="message.content.image.filename" />
       <div v-html="content" />
     </message>
-    <transition name="fade" mode="out-in">
-      <div v-if="!chosen" class="flex w-full justify-end">
-        <c-button
-          v-show="showButton"
-          :option="answer"
-          @click.native="handleChoice(message.content.link)"
+    <template v-if="showButtons">
+      <transition name="fade" mode="out-in">
+        <div v-if="!chosen" class="flex w-full justify-end">
+          <c-button
+            v-show="showButton"
+            :option="answer"
+            @click.native="handleChoice(message.content.link)"
+          />
+        </div>
+        <message
+          v-else
+          :key="chosen._uid"
+          :message="answer"
+          :is-answer="true"
         />
-      </div>
-      <message v-else :key="chosen._uid" :message="answer" :is-answer="true" />
-    </transition>
+      </transition>
+    </template>
   </div>
 </template>
 
@@ -54,6 +61,10 @@ export default {
     },
     avatar: {
       type: Object,
+      required: true,
+    },
+    showButtons: {
+      type: Boolean,
       required: true,
     },
   },

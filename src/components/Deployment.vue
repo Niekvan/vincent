@@ -8,7 +8,11 @@
     </message>
     <transition name="fade">
       <div class="flex w-full justify-end">
-        <c-button :option="globalSolutions" @click.native="switchToGlobe" />
+        <c-button
+          v-if="showButtons"
+          :option="globalSolutions"
+          @click.native="switchToGlobe"
+        />
         <c-button :option="startOver" @click.native="reset" />
       </div>
     </transition>
@@ -38,6 +42,10 @@ export default {
     },
     avatar: {
       type: Object,
+      required: true,
+    },
+    showButtons: {
+      type: Boolean,
       required: true,
     },
   },
