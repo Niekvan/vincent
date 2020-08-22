@@ -5,6 +5,12 @@
       <h1>Deployment: {{ message.content.title }}</h1>
       <c-image ref="image" :url="message.content.image.filename" />
       <div v-html="content" />
+      <span
+        class="inline-block px-2 leading-relaxed text-xs rounded-full uppercase te font-semibold"
+        :class="status.content.text_colour"
+        :style="{ background: status.content.colour }"
+        >{{ status.content.text }}</span
+      >
     </message>
     <transition name="fade">
       <div class="flex w-full justify-end">
@@ -54,10 +60,14 @@ export default {
       content: null,
       globalSolutions: 'View global solutions',
       startOver: 'Start-over',
+      status: null,
     };
   },
   created() {
     this.content = marked(this.message.content.content);
+    this.status = this.$static.statuses.edges
+      .map((edge) => edge.node)
+      .find((node) => node.uuid === this.message.content.status);
   },
   mounted() {
     this.$emit('observe', this.$refs.image.$el);
@@ -72,3 +82,17 @@ export default {
   },
 };
 </script>
+
+<static-query>
+query {
+  statuses: allStoryblokEntry(filter: { parent_id: { eq: 18481268 }}) {
+    edges {
+      node {
+        uuid
+        name
+        content
+      }
+    }
+  }
+}
+</static-query>

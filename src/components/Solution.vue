@@ -82,7 +82,7 @@ export default {
     for await (const message of this.message.content.bubbles) {
       this.bubbles.push(message);
       this.$emit('updateScroll');
-      await delay(1000);
+      await delay(Number(message.delay));
     }
 
     this.content = marked(this.message.content.content);

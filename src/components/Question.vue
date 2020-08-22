@@ -62,7 +62,7 @@ export default {
     for await (const message of this.message.content.question) {
       this.bubbles.push(message);
       this.$emit('updateScroll');
-      await delay(500);
+      await delay(Number(message.delay));
     }
 
     this.showOptions = true;

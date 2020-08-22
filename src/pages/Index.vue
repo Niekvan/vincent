@@ -27,24 +27,36 @@
         </video>
       </transition-group>
       <div
-        class="shadow-container relative ml-40 w-1/2 max-w-xl h-64 overflow-hidden bg-transparent rounded-lg"
+        class="chat-container absolute right-0 bottom-0 mr-4 mb-4 w-1/2 max-w-xl h-64 overflow-hidden bg-white bg-opacity-75 rounded-lg shadow-lg"
       >
-        <div ref="messageBox" class="list h-full pt-20 pb-20 overflow-y-scroll">
-          <component
-            :key="`${message.uuid}-${index}`"
-            v-for="(message, index) in messages"
-            :message="message"
-            :avatar="avatar"
-            :is-answer="typeof message === 'string'"
-            :is="getComponent(message)"
-            :show-buttons="!showWorld"
-            class="relative flex flex-col items-end pl-16 pr-5"
-            @choice="handleChoice"
-            @updateScroll="scrollToBottom"
-            @observe="observeElement"
-            @globe="handleGlobe"
-            @reset="handleReset"
-          />
+        <div
+          class="flex items-center px-4 h-8 bg-blue-500 text-white font-medium"
+        >
+          <span class="block leading-none">{{
+            $page.global.content.chatbox_top
+          }}</span>
+        </div>
+        <div class="shadow-container relative overflow-hidden">
+          <div
+            ref="messageBox"
+            class="list h-full pl-4 pt-20 pb-20 overflow-y-scroll"
+          >
+            <component
+              :key="`${message.uuid}-${index}`"
+              v-for="(message, index) in messages"
+              :message="message"
+              :avatar="avatar"
+              :is-answer="typeof message === 'string'"
+              :is="getComponent(message)"
+              :show-buttons="!showWorld"
+              class="relative flex flex-col items-end pl-16 pr-5"
+              @choice="handleChoice"
+              @updateScroll="scrollToBottom"
+              @observe="observeElement"
+              @globe="handleGlobe"
+              @reset="handleReset"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -263,8 +275,14 @@ query {
   scroll-behavior: smooth;
 }
 
-.shadow-container {
+.chat-container {
   height: 75%;
+  right: 1em;
+  bottom: 1em;
+}
+
+.shadow-container {
+  height: 100%;
 
   &::before,
   &::after {
