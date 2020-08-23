@@ -10,7 +10,7 @@
         <globe
           key="globe"
           v-if="world && showWorld"
-          class="max-w-screen-md"
+          class="max-w-screen-md py-20"
           :world="world"
           :solutions="solutions"
           @solution="handleGlobeSolution"
@@ -27,7 +27,7 @@
         </video>
       </transition-group>
       <div
-        class="chat-container absolute right-0 bottom-0 mr-4 mb-4 w-1/2 max-w-xl h-64 overflow-hidden bg-white bg-opacity-75 rounded-lg shadow-lg"
+        class="chat-container absolute right-0 bottom-0 mr-4 mb-4 w-1/2 max-w-lg h-64 overflow-hidden bg-white bg-opacity-75 rounded-lg shadow-lg"
       >
         <div
           class="flex items-center px-4 h-8 bg-blue-500 text-white font-medium"
@@ -39,7 +39,8 @@
         <div class="shadow-container relative overflow-hidden">
           <div
             ref="messageBox"
-            class="list h-full pl-4 pt-20 pb-20 overflow-y-scroll"
+            class="list h-full pt-10 pb-16 overflow-y-scroll"
+            :class="OS === 'Mac' ? 'px-4' : 'pl-4'"
           >
             <component
               :key="`${message.uuid}-${index}`"
@@ -102,6 +103,7 @@ export default {
       video: null,
       videoIndex: 0,
       videos: null,
+      OS: null,
     };
   },
   metaInfo() {
@@ -118,6 +120,15 @@ export default {
     };
   },
   async created() {
+    if (navigator.userAgent.match(/Linux/i)) {
+      this.OS = 'Linux';
+    } else if (navigator.userAgent.match(/Windows/i)) {
+      this.OS = 'Windows';
+    } else if (navigator.userAgent.match(/X11/i)) {
+      this.OS = 'UNIX';
+    } else if (navigator.userAgent.match(/Mac/i)) {
+      this.OS = 'Mac';
+    }
     this.avatar = this.$page.global.content.chat_bot;
     this.videos = this.$page.global.content.videos;
     this.video = this.videos[0].video.filename;
@@ -198,6 +209,7 @@ export default {
       await this.$nextTick();
       this.$refs.video.load();
       this.messages.splice(0);
+      await this.$nextTick();
       this.messages.push(this.firstMessage);
     },
     handleGlobe(show) {

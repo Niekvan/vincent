@@ -1,9 +1,9 @@
 <template>
   <div ref="container" class="relative w-full h-full">
-    <svg ref="svg" class="w-full h-full text-gray-300">
-      <path class="fill-current stroke-gray-500" :d="path" />
+    <svg ref="svg" class="w-full h-full overflow-visible text-blue-500">
+      <path class="fill-current stroke-blue-500" :d="path" />
       <path
-        class="fill-current text-transparent stroke-gray-500"
+        class="fill-current text-transparent stroke-gray-600"
         :d="graticulePath"
       />
       <circle
@@ -12,7 +12,7 @@
         :cx="coordinateToProjection(solution, 0)"
         :cy="coordinateToProjection(solution, 1)"
         :class="calculateFill(solution)"
-        class="fill-current cursor-pointer"
+        class="fill-current cursor-pointer text-yellow-500"
         r="7"
         @mouseenter="cancelRotation($event, solution)"
         @mouseleave="continueRotation"
@@ -56,6 +56,7 @@ export default {
       graticulePath: '',
       rotation: [0, -25, 0],
       projection: null,
+      resize: false,
       center: null,
       animationId: null,
       showTooltip: false,
@@ -68,12 +69,13 @@ export default {
     this.projection = geoOrthographic();
   },
   mounted() {
+    window.addEventListener('resize', this.handleResize, true);
     this.$nextTick(() => {
       this.center = [
         this.$refs.svg.clientWidth / 2,
         this.$refs.svg.clientHeight / 2,
       ];
-      this.projection.fitSize(
+      this.projection = geoOrthographic().fitSize(
         [this.$refs.svg.clientWidth, this.$refs.svg.clientHeight],
         geoJson
       );
@@ -99,10 +101,23 @@ export default {
         coordinate,
         this.projection.invert(this.center)
       );
-      return distance > Math.PI / 2 ? 'text-transparent' : 'text-blue-500';
+      return distance > Math.PI / 2 ? 'text-transparent' : 'text-yellow-500';
     },
     rotate() {
       {
+        if (this.resize) {
+          console.log('resize', this.resize);
+          this.center = [
+            this.$refs.svg.clientWidth / 2,
+            this.$refs.svg.clientHeight / 2,
+          ];
+          this.projection = geoOrthographic().fitSize(
+            [this.$refs.svg.clientWidth, this.$refs.svg.clientHeight],
+            geoJson
+          );
+          this.resize = false;
+        }
+
         this.rotation[0] = this.rotation[0] + 0.2;
 
         this.projection.rotate(this.rotation);
@@ -135,6 +150,9 @@ export default {
     },
     showSolution(solution) {
       this.$emit('solution', solution);
+    },
+    handleResize() {
+      this.resize = true;
     },
   },
 };
