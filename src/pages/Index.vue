@@ -25,6 +25,12 @@
         >
           <source :src="video" type="video/mp4" />
         </video>
+        <deployment
+          :key="selectedDeployment.uuid"
+          v-if="selectedDeployment"
+          :message="selectedDeployment"
+          @resetDeployment="resetDeployment"
+        />
       </transition-group>
       <div
         class="chat-container absolute right-0 bottom-0 mr-4 mb-4 w-1/2 max-w-lg h-64 overflow-hidden bg-white bg-opacity-75 rounded-lg shadow-lg"
@@ -52,6 +58,7 @@
               :show-buttons="!showWorld"
               class="relative flex flex-col items-end pl-16 pr-5"
               @choice="handleChoice"
+              @deployment="handleDeployment"
               @updateScroll="scrollToBottom"
               @observe="observeElement"
               @globe="handleGlobe"
@@ -104,6 +111,7 @@ export default {
       videoIndex: 0,
       videos: null,
       OS: null,
+      selectedDeployment: null,
     };
   },
   metaInfo() {
@@ -204,6 +212,7 @@ export default {
     },
     async handleReset() {
       this.showWorld = false;
+      this.selectedDeployment = null;
       this.videoIndex = 0;
       this.video = this.videos[this.videoIndex].video.filename;
       await this.$nextTick();
@@ -216,16 +225,34 @@ export default {
       this.messages.splice(0);
       this.messages.push(this.$page.globeMessage);
       this.showWorld = show;
+      if (show) {
+        this.selectedDeployment = null;
+      }
     },
     async handleGlobeSolution(solution) {
+      const totalDelay = solution.content.bubbles.reduce(
+        (total, item) => total + Number(item.delay),
+        0
+      );
+      console.log(totalDelay);
       const deployment = this.deployments.find(
         (deployment) => (deployment.uuid = solution.content.link.id)
       );
+
       this.messages.push(solution);
       this.scrollToBottom();
-      await delay(1000 * (solution.content.bubbles.length + 1));
-      this.messages.push(deployment);
+      await delay(totalDelay);
+      this.selectedDeployment = deployment;
+    },
+    handleDeployment(id) {
+      const deployment = this.deployments.find(
+        (deployment) => deployment.uuid === id
+      );
+      this.selectedDeployment = deployment;
       this.scrollToBottom();
+    },
+    resetDeployment() {
+      this.selectedDeployment = null;
     },
     async scrollToBottom() {
       await this.$nextTick();

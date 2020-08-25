@@ -26,11 +26,23 @@
           />
         </div>
         <message
-          v-else
+          v-else-if="chosen && answer"
           :key="chosen._uid"
           :message="answer"
           :is-answer="true"
         />
+      </transition>
+    </template>
+    <template v-if="chosen">
+      <transition name="fade">
+        <div class="flex w-full justify-end">
+          <c-button
+            v-if="showButtons"
+            :option="globalSolutions"
+            @click.native="switchToGlobe"
+          />
+          <c-button :option="startOver" @click.native="reset" />
+        </div>
       </transition>
     </template>
   </div>
@@ -72,6 +84,8 @@ export default {
     return {
       bubbles: [],
       answer: 'View depoyment solution',
+      globalSolutions: 'View global solutions',
+      startOver: 'Start-over',
       content: null,
       showSolution: false,
       showButton: false,
@@ -91,14 +105,23 @@ export default {
     this.$emit('observe', this.$refs.image.$el);
 
     this.showButton = true;
+    if (this.showButtons === false) {
+      this.chosen = true;
+    }
     this.$emit('updateScroll');
   },
   methods: {
     handleChoice(option) {
       if (this.chosen === null) {
         this.chosen = option;
-        this.$emit('choice', { link: option.id });
+        this.$emit('deployment', option.id);
       }
+    },
+    switchToGlobe() {
+      this.$emit('globe', true);
+    },
+    reset() {
+      this.$emit('reset');
     },
   },
 };

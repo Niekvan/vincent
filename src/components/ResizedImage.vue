@@ -1,5 +1,5 @@
 <template>
-  <div class="relative" :style="padding">
+  <div class="relative rounded-lg overflow-hidden observe" :style="padding">
     <picture>
       <source :data-srcset="srcsetWebp" type="image/webp" />
       <source :data-srcset="srcset" />
@@ -46,5 +46,3 @@ export default {
   },
 };
 </script>
-
-<style></style>
