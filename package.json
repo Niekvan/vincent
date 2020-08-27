@@ -7,7 +7,7 @@
     "explore": "gridsome explore"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.20.0",
     "d3": "^5.16.0",
     "gridsome": "^0.7.0",
     "gridsome-source-storyblok": "^1.0.2",

@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <div class="wrapper flex flex-col justify-center">
+    <div class="wrapper flex flex-col justify-center overflow-hidden">
       <transition-group
         name="fade"
         mode="out-in"

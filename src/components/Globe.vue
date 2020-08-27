@@ -7,7 +7,7 @@
         :d="graticulePath"
       />
       <circle
-        :key="solution.content._uid"
+        :key="solution.uuid"
         v-for="solution in solutions"
         :cx="coordinateToProjection(solution, 0)"
         :cy="coordinateToProjection(solution, 1)"
