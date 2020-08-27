@@ -1,3 +1,5 @@
+const { colors } = require('tailwindcss/defaultTheme');
+
 module.exports = {
   purge: {
     content: ['./src/**/*.vue', './src/**/*.js', './src/**/*.html'],
@@ -22,6 +24,12 @@ module.exports = {
   theme: {
     extend: {
       stroke: (theme) => theme('colors'),
+      colors: {
+        blue: {
+          ...colors.blue,
+          '500': '#0089ff',
+        },
+      },
     },
   },
   variants: {},

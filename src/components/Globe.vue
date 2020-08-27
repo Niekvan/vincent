@@ -1,9 +1,15 @@
 <template>
   <div ref="container" class="relative w-full h-full">
     <svg ref="svg" class="w-full h-full overflow-visible text-blue-500">
+      <defs>
+        <radialGradient id="g1" cx="50%" cy="50%" r="50%">
+          <stop stop-color="#82fff7" offset="0%" />
+          <stop stop-color="#00ff22" offset="100%" />
+        </radialGradient>
+      </defs>
       <path class="fill-current stroke-blue-500" :d="path" />
       <path
-        class="fill-current text-transparent stroke-gray-600"
+        class="fill-current text-transparent stroke-gray-500"
         :d="graticulePath"
       />
       <circle
@@ -12,8 +18,9 @@
         :cx="coordinateToProjection(solution, 0)"
         :cy="coordinateToProjection(solution, 1)"
         :class="calculateFill(solution)"
-        class="fill-current cursor-pointer text-yellow-500"
-        r="7"
+        class="cursor-pointer"
+        r="16"
+        fill="url('#g1')"
         @mouseenter="cancelRotation($event, solution)"
         @mouseleave="continueRotation"
         @click="showSolution(solution)"
@@ -101,7 +108,7 @@ export default {
         coordinate,
         this.projection.invert(this.center)
       );
-      return distance > Math.PI / 2 ? 'text-transparent' : 'text-yellow-500';
+      return distance > Math.PI / 2 ? 'fill-current text-transparent' : '';
     },
     rotate() {
       {
