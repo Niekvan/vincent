@@ -113,7 +113,6 @@ export default {
     rotate() {
       {
         if (this.resize) {
-          console.log('resize', this.resize);
           this.center = [
             this.$refs.svg.clientWidth / 2,
             this.$refs.svg.clientHeight / 2,

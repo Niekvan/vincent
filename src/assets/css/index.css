@@ -1,20 +1,14 @@
 @import './tailwind.css';
 
-:root {
-  --margin-top: 105px;
-}
-
 html {
   position: relative;
-  height: calc(100vh - 105px);
-  margin-top: 105px;
-  height: calc(100vh - var(--margin-top));
-  margin-top: var(--margin-top);
+  height: 100%;
 }
 
 body {
   width: 100%;
   height: 100%;
+  background: white;
 }
 
 .fade-enter-active,

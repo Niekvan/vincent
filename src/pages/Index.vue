@@ -17,13 +17,13 @@
         />
         <video
           key="video"
-          v-show="!showWorld"
+          v-show="!showWorld && showVideo"
           ref="video"
           class="video"
           autoplay
           muted
         >
-          <source :src="video" type="video/mp4" />
+          <source :src="video.video.filename" type="video/mp4" />
         </video>
         <deployment
           :key="selectedDeployment.uuid"
@@ -110,21 +110,9 @@ export default {
       video: null,
       videoIndex: 0,
       videos: null,
+      showVideo: true,
       OS: null,
       selectedDeployment: null,
-    };
-  },
-  metaInfo() {
-    const edge = this.$page.allStoryblokEntry.edges.find(
-      (edge) => edge.node.name === 'global'
-    );
-    return {
-      link: edge.node.content.videos.map((item) => ({
-        rel: 'preload',
-        href: item.video.filename,
-        as: 'video',
-        type: 'video/mp4',
-      })),
     };
   },
   async created() {
@@ -139,7 +127,7 @@ export default {
     }
     this.avatar = this.$page.global.content.chat_bot;
     this.videos = this.$page.global.content.videos;
-    this.video = this.videos[0].video.filename;
+    this.video = this.videos[0];
 
     this.questions = this.$page.allStoryblokEntry.edges
       .filter((edge) =>
@@ -198,11 +186,15 @@ export default {
       );
       if (
         this.videoIndex < this.videos.length - 1 &&
-        !newQuestion.is_startpage
+        !newQuestion.name.toLowerCase().includes('convincing')
       ) {
+        this.showVideo = false;
         this.videoIndex++;
-        this.video = this.videos[this.videoIndex].video.filename;
+        await delay(500);
+        this.video = this.videos[this.videoIndex];
         this.$refs.video.load();
+        await delay(100);
+        this.showVideo = true;
       }
 
       setTimeout(() => {
@@ -214,7 +206,7 @@ export default {
       this.showWorld = false;
       this.selectedDeployment = null;
       this.videoIndex = 0;
-      this.video = this.videos[this.videoIndex].video.filename;
+      this.video = this.videos[this.videoIndex];
       await this.$nextTick();
       this.$refs.video.load();
       this.messages.splice(0);
