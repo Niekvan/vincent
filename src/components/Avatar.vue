@@ -19,10 +19,10 @@ export default {
   },
   computed: {
     imageSrc() {
-      return this.url.replace(
+      return `${this.url.replace(
         'https://a.storyblok.com',
         'https://img2.storyblok.com/200x200/smart'
-      );
+      )}?time=${Date.now()}`;
     },
   },
 };
