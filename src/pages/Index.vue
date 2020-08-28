@@ -116,14 +116,16 @@ export default {
     };
   },
   async created() {
-    if (navigator.userAgent.match(/Linux/i)) {
-      this.OS = 'Linux';
-    } else if (navigator.userAgent.match(/Windows/i)) {
-      this.OS = 'Windows';
-    } else if (navigator.userAgent.match(/X11/i)) {
-      this.OS = 'UNIX';
-    } else if (navigator.userAgent.match(/Mac/i)) {
-      this.OS = 'Mac';
+    if (process.isClient) {
+      if (navigator.userAgent.match(/Linux/i)) {
+        this.OS = 'Linux';
+      } else if (navigator.userAgent.match(/Windows/i)) {
+        this.OS = 'Windows';
+      } else if (navigator.userAgent.match(/X11/i)) {
+        this.OS = 'UNIX';
+      } else if (navigator.userAgent.match(/Mac/i)) {
+        this.OS = 'Mac';
+      }
     }
     this.avatar = this.$page.global.content.chat_bot;
     this.videos = this.$page.global.content.videos;
