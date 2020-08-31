@@ -9,7 +9,7 @@
       >
         <globe
           key="globe"
-          v-if="world && showWorld"
+          v-if="world && !showWorld"
           class="max-w-screen-md py-20"
           :world="world"
           :solutions="solutions"

@@ -1,10 +1,15 @@
 <template>
   <div
     ref="deployment"
-    class="deployment absolute bottom-0 left-0 ml-10 my-4 max-w-md w-full h-0 z-10 transition-transform duration-500"
-    :style="{ transform }"
+    class="deployment absolute bottom-0 left-0 ml-10 py-4 max-w-md w-full h-full z-10 overflow-hidden"
   >
-    <transition-group tag="div" name="fade" mode="out-in" class="w-full">
+    <transition-group
+      ref="scroll"
+      tag="div"
+      name="fade"
+      mode="out-in"
+      class="scroll h-full overflow-y-scroll"
+    >
       <message
         :key="`${message.uuid}-first`"
         :is-solution="true"
@@ -85,23 +90,13 @@ export default {
       messages: [],
     };
   },
-  computed: {
-    transform() {
-      if (!this.messages.length) return '0px';
-      return `translateY(${this.messages
-        .slice(0, this.messageCount + 1)
-        .reduce(
-          (acc, item) => acc - item.getBoundingClientRect().height - 8,
-          0
-        )}px)`;
-    },
-  },
   created() {
     this.status = this.$static.statuses.edges
       .map((edge) => edge.node)
       .find((node) => node.uuid === this.message.content.status);
   },
   mounted() {
+    console.log(this.$refs.scroll);
     this.messages = Array.from(
       this.$refs.deployment.querySelectorAll('.message')
     );
@@ -111,10 +106,14 @@ export default {
     });
     const interval = setInterval(() => {
       this.messageCount++;
+      this.$nextTick(
+        () =>
+          (this.$refs.scroll.$el.scrollTop = this.$refs.scroll.$el.scrollHeight)
+      );
       if (this.messageCount > this.message.content.message_bubbles.length + 2) {
         clearInterval(interval);
       }
-    }, 300);
+    }, 1000);
   },
   methods: {
     reset() {
@@ -140,3 +139,37 @@ query {
   }
 }
 </static-query>
+
+<style lang="postcss" scoped>
+.deployment {
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 1.5rem;
+    left: 0;
+    right: 0;
+  }
+
+  &::before {
+    top: 1rem;
+    background: linear-gradient(to top, hsla(0, 0%, 100%, 0) 25%, #ffffff 100%);
+    z-index: 1;
+  }
+
+  &::after {
+    bottom: 1rem;
+    background: linear-gradient(
+      to bottom,
+      hsla(0, 0%, 100%, 0) 25%,
+      #ffffff 100%
+    );
+  }
+}
+
+.scroll {
+  width: calc(100% + 17px);
+  scroll-behavior: smooth;
+}
+</style>
