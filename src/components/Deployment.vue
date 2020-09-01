@@ -96,7 +96,6 @@ export default {
       .find((node) => node.uuid === this.message.content.status);
   },
   mounted() {
-    console.log(this.$refs.scroll);
     this.messages = Array.from(
       this.$refs.deployment.querySelectorAll('.message')
     );

@@ -9,7 +9,7 @@
       >
         <globe
           key="globe"
-          v-if="world && showWorld"
+          v-if="world && !showWorld"
           class="max-w-screen-md py-20"
           :world="world"
           :solutions="solutions"
@@ -224,19 +224,24 @@ export default {
       }
     },
     async handleGlobeSolution(solution) {
+      this.selectedDeployment = null;
       const totalDelay = solution.content.bubbles.reduce(
         (total, item) => total + Number(item.delay),
         0
       );
-      console.log(totalDelay);
       const deployment = this.deployments.find(
-        (deployment) => (deployment.uuid = solution.content.link.id)
+        (deployment) => deployment.uuid === solution.content.link.id
       );
+
+      console.log(solution.content.link.id);
+      console.log(deployment.uuid, deployment.name);
 
       this.messages.push(solution);
       this.scrollToBottom();
       await delay(totalDelay);
-      this.selectedDeployment = deployment;
+      if (deployment) {
+        this.selectedDeployment = deployment;
+      }
     },
     handleDeployment(id) {
       const deployment = this.deployments.find(
