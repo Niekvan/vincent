@@ -21,14 +21,14 @@
         <div v-if="!chosen" class="flex w-full justify-end">
           <c-button
             v-show="showButton"
-            :option="answer"
+            :option="$static.global.content.view_deployment_button"
             @click.native="handleChoice(message.content.link)"
           />
         </div>
         <message
-          v-else-if="chosen && answer"
+          v-else-if="chosen"
           :key="chosen._uid"
-          :message="answer"
+          :message="$static.global.content.view_deployment_button"
           :is-answer="true"
         />
       </transition>
@@ -92,6 +92,9 @@ export default {
       chosen: null,
     };
   },
+  created() {
+    console.log(this.$static.global.content);
+  },
   async mounted() {
     for await (const message of this.message.content.bubbles) {
       this.bubbles.push(message);
@@ -126,3 +129,13 @@ export default {
   },
 };
 </script>
+
+<static-query>
+query {
+  global: storyblokEntry(id: "story-17760467-default") {
+    content
+    id
+    uuid
+  }
+}
+</static-query>
