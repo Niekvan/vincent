@@ -25,7 +25,6 @@
           ref="video"
           class="video"
           autoplay
-          muted
         >
           <source :src="video.video.filename" type="video/mp4" />
         </video>
