@@ -1,6 +1,10 @@
 <template>
   <Layout>
     <div class="wrapper flex flex-col justify-center overflow-hidden">
+      <audio
+        ref="sound"
+        :src="$page.global.content.message_sound.filename"
+      ></audio>
       <transition-group
         name="fade"
         mode="out-in"
@@ -46,7 +50,10 @@
           <div
             ref="messageBox"
             class="list h-full pt-10 pb-16 overflow-y-scroll"
-            :class="OS === 'Mac' ? 'px-4' : 'pl-4'"
+            :class="[
+              OS === 'Mac' ? 'px-4' : 'pl-4',
+              isFirefox ? 'firefox' : '',
+            ]"
           >
             <component
               :key="`${message.uuid}-${index}`"
@@ -112,6 +119,7 @@ export default {
       videos: null,
       showVideo: true,
       OS: null,
+      isFirefox: false,
       selectedDeployment: null,
     };
   },
@@ -125,6 +133,10 @@ export default {
         this.OS = 'UNIX';
       } else if (navigator.userAgent.match(/Mac/i)) {
         this.OS = 'Mac';
+      }
+
+      if (navigator.userAgent.match('Firefox')) {
+        this.isFirefox = true;
       }
     }
     this.avatar = this.$page.global.content.chat_bot;
@@ -254,6 +266,7 @@ export default {
       this.selectedDeployment = null;
     },
     async scrollToBottom() {
+      this.$refs.sound.play();
       await this.$nextTick();
       this.$refs.messageBox.scrollTop = this.$refs.messageBox.scrollHeight;
     },
@@ -311,6 +324,12 @@ query {
 .list {
   width: calc(100% + 17px);
   scroll-behavior: smooth;
+
+  &.firefox {
+    > div:last-child {
+      @apply mb-16;
+    }
+  }
 }
 
 .chat-container {
