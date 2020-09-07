@@ -13,23 +13,26 @@
       <message
         :key="`${message.uuid}-first`"
         :is-solution="true"
-        class="message"
+        class="message message--first bg-blue-500 mt-4 rounded-tl-lg"
       >
         <div class="flex justify-between text-blue-500">
-          <h1 class="mb-2">
+          <h1 :class="{ 'mb-2': message.content.image.filename }">
             Deployment:
             <span class="font-medium">{{ message.content.title }}</span>
           </h1>
           <span class="underline cursor-pointer" @click="reset">close</span>
         </div>
-        <c-image :url="message.content.image.filename" />
+        <c-image
+          v-if="message.content.image.filename"
+          :url="message.content.image.filename"
+        />
       </message>
       <message
         :key="message._uid"
         v-for="(message, index) in message.content.message_bubbles"
         v-show="index < messageCount"
         :is-solution="true"
-        class="flex justify-between items-center message"
+        class="flex justify-between items-center rounded-tl-lg message"
       >
         <div class="" v-html="createMarkdown(message.text)" />
         <div class="w-32">
@@ -43,7 +46,7 @@
         :key="`${message.uuid}-last`"
         v-show="message.content.message_bubbles.length + 1 < messageCount"
         :is-solution="true"
-        class="message"
+        class="message rounded-tl-lg"
       >
         <p>
           Status:
@@ -164,6 +167,16 @@ query {
       hsla(0, 0%, 100%, 0) 25%,
       #ffffff 100%
     );
+  }
+}
+
+.message {
+  &--first {
+    &::v-deep {
+      & > div {
+        @apply text-white;
+      }
+    }
   }
 }
 
