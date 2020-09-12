@@ -30,7 +30,7 @@
       <message
         :key="message._uid"
         v-for="(message, index) in message.content.message_bubbles"
-        v-show="index < messageCount"
+        v-show="index + 1 < messageCount"
         :is-solution="true"
         class="flex justify-between items-center rounded-tl-lg message"
       >
@@ -91,6 +91,7 @@ export default {
       status: null,
       messageCount: 0,
       messages: [],
+      interval: null,
     };
   },
   created() {
@@ -102,24 +103,27 @@ export default {
     this.messages = Array.from(
       this.$refs.deployment.querySelectorAll('.message')
     );
+
     const images = this.$refs.deployment.querySelectorAll('.observe');
     images.forEach((image) => {
       this.$emit('observe', image);
     });
-    const interval = setInterval(() => {
+
+    this.interval = setInterval(() => {
       this.messageCount++;
       this.$nextTick(
         () =>
           (this.$refs.scroll.$el.scrollTop = this.$refs.scroll.$el.scrollHeight)
       );
       if (this.messageCount > this.message.content.message_bubbles.length + 2) {
-        clearInterval(interval);
+        clearInterval(this.interval);
       }
     }, 1000);
   },
   methods: {
     reset() {
       this.$emit('resetDeployment');
+      clearInterval(this.interval);
     },
     createMarkdown(content) {
       return marked(content);
@@ -138,7 +142,7 @@ query {
         content
       }
     }
-  }
+  },
 }
 </static-query>
 

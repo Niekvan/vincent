@@ -1,5 +1,9 @@
 <template>
   <div>
+    <audio
+      ref="sound"
+      :src="$static.global.content.answer_sound.filename"
+    ></audio>
     <avatar :url="avatar.filename" />
     <message
       :key="bubble._uid"
@@ -73,8 +77,19 @@ export default {
       if (this.chosen === null) {
         this.chosen = option;
         this.$emit('choice', { link: option.link.id });
+        this.$refs.sound.play();
       }
     },
   },
 };
 </script>
+
+<static-query>
+query {
+  global: storyblokEntry(id: "story-17760467-default") {
+    content
+    id
+    uuid
+  }
+}
+</static-query>
