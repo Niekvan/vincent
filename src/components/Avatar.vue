@@ -1,5 +1,7 @@
 <template>
-  <div class="avatar overflow-hidden bg-red-700 rounded-full">
+  <div
+    class="avatar absolute top-0 left-0 box-border overflow-hidden bg-red-700 rounded-full"
+  >
     <img class="avatar__image" :src="imageSrc" />
   </div>
 </template>
@@ -30,13 +32,7 @@ export default {
 
 <style scoped>
 .avatar {
-  position: absolute;
-
-  top: 0;
-  left: 0;
-
   width: 3rem;
   height: 3rem;
-  box-sizing: border-box;
 }
 </style>

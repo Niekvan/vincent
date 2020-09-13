@@ -17,13 +17,8 @@
 </template>
 
 <script>
-import CButton from './Button';
-
 export default {
   name: 'Message',
-  components: {
-    CButton,
-  },
   props: {
     message: {
       type: String,

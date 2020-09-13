@@ -35,44 +35,62 @@
           @resetDeployment="resetDeployment"
         />
       </transition-group>
-      <div
-        class="chat-container absolute right-0 bottom-0 mr-4 mb-4 w-1/2 max-w-lg h-64 overflow-hidden bg-white bg-opacity-75 rounded-lg shadow-lg"
-      >
+      <transition name="fade" appear>
         <div
-          class="flex items-center px-4 h-8 bg-blue-500 text-white font-medium"
+          v-if="!started"
+          class="absolute flex items-center right-0 bottom-0 mr-4 mb-4"
         >
-          <span class="block leading-none">{{
-            $page.global.content.chatbox_top
-          }}</span>
+          <avatar
+            :url="$page.global.content.chat_bot.filename"
+            class="relative"
+          />
+          <c-button
+            :option="$page.global.content.start_text"
+            @click.native="startSequence"
+          />
         </div>
-        <div class="shadow-container relative overflow-hidden">
+      </transition>
+      <transition name="fade-up">
+        <div
+          v-if="started"
+          class="chat-container absolute right-0 bottom-0 mr-4 mb-4 w-1/2 max-w-lg h-64 overflow-hidden bg-white bg-opacity-75 rounded-lg shadow-lg"
+        >
           <div
-            ref="messageBox"
-            class="list h-full pt-10 pb-16 overflow-y-scroll"
-            :class="[
-              OS === 'Mac' ? 'px-4' : 'pl-4',
-              isFirefox ? 'firefox' : '',
-            ]"
+            class="flex items-center px-4 h-8 bg-blue-500 text-white font-medium"
           >
-            <component
-              :key="`${message.uuid}-${index}`"
-              v-for="(message, index) in messages"
-              :message="message"
-              :avatar="avatar"
-              :is-answer="typeof message === 'string'"
-              :is="getComponent(message)"
-              :show-buttons="!showWorld"
-              class="relative flex flex-col items-end pl-16 pr-5"
-              @choice="handleChoice"
-              @deployment="handleDeployment"
-              @updateScroll="scrollToBottom"
-              @observe="observeElement"
-              @globe="handleGlobe"
-              @reset="handleReset"
-            />
+            <span class="block leading-none">{{
+              $page.global.content.chatbox_top
+            }}</span>
+          </div>
+          <div class="shadow-container relative overflow-hidden">
+            <div
+              ref="messageBox"
+              class="list h-full pt-10 pb-16 overflow-y-scroll"
+              :class="[
+                OS === 'Mac' ? 'px-4' : 'pl-4',
+                isFirefox ? 'firefox' : '',
+              ]"
+            >
+              <component
+                :key="`${message.uuid}-${index}`"
+                v-for="(message, index) in messages"
+                :message="message"
+                :avatar="avatar"
+                :is-answer="typeof message === 'string'"
+                :is="getComponent(message)"
+                :show-buttons="!showWorld"
+                class="relative flex flex-col items-end pl-16 pr-5"
+                @choice="handleChoice"
+                @deployment="handleDeployment"
+                @updateScroll="scrollToBottom"
+                @observe="observeElement"
+                @globe="handleGlobe"
+                @reset="handleReset"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </transition>
     </div>
   </Layout>
 </template>
@@ -84,6 +102,8 @@ import { delay } from '@/helpers';
 
 import Globe from '../components/Globe';
 
+import Avatar from '../components/Avatar';
+import CButton from '../components/Button';
 import Message from '../components/Message';
 
 import Deployment from '../components/Deployment';
@@ -96,8 +116,10 @@ export default {
     title: 'Geodesign',
   },
   components: {
-    Globe,
+    Avatar,
+    CButton,
     Deployment,
+    Globe,
     Message,
     Question,
     Solution,
@@ -120,6 +142,7 @@ export default {
       OS: null,
       isFirefox: false,
       selectedDeployment: null,
+      started: false,
     };
   },
   async created() {
@@ -275,6 +298,10 @@ export default {
     },
     observeElement(element) {
       this.observer.observe(element);
+    },
+    startSequence() {
+      this.started = true;
+      this.$refs.video.play();
     },
   },
 };

@@ -20,6 +20,17 @@ body {
   opacity: 0;
 }
 
+.fade-up-enter-active,
+.fade-up-leave-active {
+  transition: all 0.7s ease;
+}
+
+.fade-up-enter,
+.fade-up-leave-to {
+  transform: translateY(2rem);
+  opacity: 0;
+}
+
 .image.lazyload,
 .image.lazyloaded {
   position: absolute;
