@@ -3,6 +3,8 @@ const postcssNested = require('postcss-nested');
 
 module.exports = {
   siteName: 'Geodesign',
+  siteUrl: process.env.SITE_URL,
+  pathPrefix: process.env.PATH_PREFIX,
   plugins: [
     {
       use: 'gridsome-source-storyblok',
