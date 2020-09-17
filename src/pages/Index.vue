@@ -37,7 +37,7 @@
       </transition-group>
       <transition name="fade" appear>
         <div
-          v-if="!started"
+          v-if="!hasStartedSequence"
           class="absolute flex items-center right-0 bottom-0 mr-4 mb-4"
         >
           <avatar
@@ -52,7 +52,7 @@
       </transition>
       <transition name="fade-up">
         <div
-          v-if="started"
+          v-if="hasStartedSequence"
           class="chat-container absolute right-0 bottom-0 mr-4 mb-4 w-1/2 max-w-lg h-64 overflow-hidden bg-white bg-opacity-75 rounded-lg shadow-lg"
         >
           <div
@@ -142,7 +142,7 @@ export default {
       OS: null,
       isFirefox: false,
       selectedDeployment: null,
-      started: false,
+      hasStartedSequence: false,
     };
   },
   async created() {
@@ -300,6 +300,7 @@ export default {
       this.observer.observe(element);
     },
     startSequence() {
+      console.log('start');
       this.started = true;
       this.$refs.video.play();
     },
