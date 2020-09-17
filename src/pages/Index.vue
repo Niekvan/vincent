@@ -301,7 +301,7 @@ export default {
     },
     startSequence() {
       console.log('start');
-      this.started = true;
+      this.hasStartedSequence = true;
       this.$refs.video.play();
     },
   },
