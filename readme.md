@@ -1,12 +1,9 @@
-# todo
+# AVA
 
-- [x] Handle deployment emit
-- [x] Reset chat state
-- [x] Toggle globe and video
-- [x] New video each question
-- [ ] Color palette
-- [x] Fade shadow top/bottom message box
-- [ ] Chatbot image
-- [x] Shadows messages/buttons
-- [x] Animate first message
-- [x] Animate chatbot start
+## Covid GEO--Design exhibition project
+
+A project by Vincent Thornhill and Niek van Sleeuwen
+
+AVA is a chatbot that will guide you through different technological solutions that aim to aid in solving the global Covid-19 pandemic.
+
+live at [https://covid.geodesign.online/projects/vincent-thornhill](https://covid.geodesign.online/projects/vincent-thornhill)
